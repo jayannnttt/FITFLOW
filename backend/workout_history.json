@@ -1,0 +1,26 @@
+[
+  {
+    "date": "2026-08-05 00:00:17",
+    "exercise": "Bicep Curl",
+    "reps": 2,
+    "sets": 1,
+    "elapsed_time": 36.8,
+    "avg_score": 74
+  },
+  {
+    "date": "2026-08-05 00:00:35",
+    "exercise": "Squats",
+    "reps": 0,
+    "sets": 0,
+    "elapsed_time": 6.2,
+    "avg_score": 0
+  },
+  {
+    "date": "2026-08-05 00:00:57",
+    "exercise": "Lunges",
+    "reps": 0,
+    "sets": 0,
+    "elapsed_time": 20.3,
+    "avg_score": 0
+  }
+]

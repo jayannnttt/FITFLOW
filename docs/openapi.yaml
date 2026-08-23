@@ -1,0 +1,190 @@
+openapi: 3.0.3
+info:
+  title: AI Fitness Coach API Server
+  description: OpenAPI 3.0 specification for FastAPI server and WebSocket inference endpoints in AI Fitness Coach.
+  version: 2.0.0
+servers:
+  - url: http://127.0.0.1:8000
+    description: Local Development Server
+
+paths:
+  /api/categories:
+    get:
+      summary: Get workout categories
+      description: Returns exercise categories and exercise list hierarchy from system configuration.
+      operationId: getCategories
+      responses:
+        '200':
+          description: Workout categories returned successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                additionalProperties:
+                  $ref: '#/components/schemas/Category'
+
+  /api/exercises/{name}:
+    get:
+      summary: Get exercise metadata
+      description: Returns detailed configuration, alignment settings, thresholds, and coaching rules for a specific exercise.
+      operationId: getExerciseInfo
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: Name of the target exercise (e.g. Bicep Curl, Squats)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Exercise metadata returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExerciseConfig'
+        '404':
+          description: Exercise not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPError'
+
+  /api/history:
+    get:
+      summary: Get workout history
+      description: Returns recorded workout history session entries.
+      operationId: getWorkoutHistory
+      responses:
+        '200':
+          description: History entries returned successfully
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/WorkoutHistoryEntry'
+
+  /api/summary:
+    get:
+      summary: Get latest workout session summary
+      description: Returns current active or latest workout summary statistics.
+      operationId: getLatestSummary
+      responses:
+        '200':
+          description: Summary returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WorkoutSummary'
+
+components:
+  schemas:
+    Category:
+      type: object
+      properties:
+        name:
+          type: string
+          example: UPPER BODY
+        exercises:
+          type: array
+          items:
+            type: string
+          example: ["Bicep Curl", "Shoulder Press", "Push-ups", "Pull-ups"]
+
+    ExerciseConfig:
+      type: object
+      properties:
+        type:
+          type: string
+          example: REP_BASED
+        category:
+          type: string
+          example: UPPER BODY
+        primary_joint:
+          type: string
+          example: elbow
+        keypoints:
+          type: array
+          items:
+            type: string
+          example: ["left_shoulder", "left_elbow", "left_wrist"]
+        alt_keypoints:
+          type: array
+          items:
+            type: string
+          example: ["right_shoulder", "right_elbow", "right_wrist"]
+        down_threshold:
+          type: number
+          format: float
+          example: 150.0
+        up_threshold:
+          type: number
+          format: float
+          example: 90.0
+        target_reps:
+          type: integer
+          example: 10
+        cooldown:
+          type: number
+          format: float
+          example: 0.8
+        alignment:
+          type: object
+        checks:
+          type: object
+
+    WorkoutHistoryEntry:
+      type: object
+      properties:
+        date:
+          type: string
+          example: "2026-08-05 00:00:17"
+        exercise:
+          type: string
+          example: "Bicep Curl"
+        reps:
+          type: integer
+          example: 10
+        sets:
+          type: integer
+          example: 1
+        elapsed_time:
+          type: number
+          format: float
+          example: 36.8
+        avg_score:
+          type: number
+          format: float
+          example: 85.0
+
+    WorkoutSummary:
+      type: object
+      properties:
+        has_summary:
+          type: boolean
+          example: true
+        exercise:
+          type: string
+          example: "Bicep Curl"
+        reps:
+          type: integer
+          example: 10
+        sets:
+          type: integer
+          example: 1
+        duration_sec:
+          type: integer
+          example: 45
+        form_score:
+          type: integer
+          example: 88
+        calories_burned:
+          type: integer
+          example: 7
+
+    HTTPError:
+      type: object
+      properties:
+        detail:
+          type: string
+          example: Exercise not found

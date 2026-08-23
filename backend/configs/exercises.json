@@ -1,0 +1,386 @@
+{
+  "categories": {
+    "1": {
+      "name": "UPPER BODY",
+      "exercises": ["Bicep Curl", "Shoulder Press", "Push-ups", "Pull-ups"]
+    },
+    "2": {
+      "name": "LOWER BODY",
+      "exercises": ["Squats", "Lunges", "Calf Raises"]
+    },
+    "3": {
+      "name": "CORE",
+      "exercises": ["Russian Twists", "Crunches", "Mountain Climbers"]
+    },
+    "4": {
+      "name": "FULL BODY / CARDIO",
+      "exercises": ["Jumping Jacks", "High Knees"]
+    }
+  },
+  "exercises": {
+    "Bicep Curl": {
+      "type": "REP_BASED",
+      "category": "UPPER BODY",
+      "primary_joint": "elbow",
+      "keypoints": ["left_shoulder", "left_elbow", "left_wrist"],
+      "alt_keypoints": ["right_shoulder", "right_elbow", "right_wrist"],
+      "down_threshold": 150.0,
+      "up_threshold": 90.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 175.0,
+          "right_elbow": 175.0,
+          "torso": 180.0
+        },
+        "tolerances": {
+          "left_elbow": 30.0,
+          "right_elbow": 30.0,
+          "torso": 25.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Straighten your left arm to start",
+          "right_elbow": "Straighten your right arm to start",
+          "torso": "Stand upright with back straight"
+        }
+      },
+      "checks": {
+        "elbow_swing": {"max_shoulder_movement": 30.0},
+        "incomplete_extension": {"min_down_angle": 140.0}
+      }
+    },
+    "Shoulder Press": {
+      "type": "REP_BASED",
+      "category": "UPPER BODY",
+      "primary_joint": "elbow",
+      "keypoints": ["left_shoulder", "left_elbow", "left_wrist"],
+      "alt_keypoints": ["right_shoulder", "right_elbow", "right_wrist"],
+      "down_threshold": 150.0,
+      "up_threshold": 90.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 90.0,
+          "right_elbow": 90.0,
+          "torso": 180.0
+        },
+        "tolerances": {
+          "left_elbow": 20.0,
+          "right_elbow": 20.0,
+          "torso": 15.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Raise your left elbow to shoulder height",
+          "right_elbow": "Raise your right elbow to shoulder height",
+          "torso": "Keep your posture upright"
+        }
+      },
+      "checks": {
+        "uneven_arms": {"max_arm_diff": 25.0}
+      }
+    },
+    "Push-ups": {
+      "type": "REP_BASED",
+      "category": "UPPER BODY",
+      "primary_joint": "elbow",
+      "keypoints": ["left_shoulder", "left_elbow", "left_wrist"],
+      "alt_keypoints": ["right_shoulder", "right_elbow", "right_wrist"],
+      "down_threshold": 160.0,
+      "up_threshold": 100.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 170.0,
+          "right_elbow": 170.0,
+          "hip": 175.0
+        },
+        "tolerances": {
+          "left_elbow": 20.0,
+          "right_elbow": 20.0,
+          "hip": 20.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Extend your arms fully in plank position",
+          "right_elbow": "Extend your arms fully in plank position",
+          "hip": "Keep your back and hips in a straight line"
+        }
+      },
+      "checks": {
+        "hip_sagging": {"min_hip_angle": 150.0},
+        "partial_rom": {"max_up_angle": 110.0}
+      }
+    },
+    "Pull-ups": {
+      "type": "REP_BASED",
+      "category": "UPPER BODY",
+      "primary_joint": "elbow",
+      "keypoints": ["left_shoulder", "left_elbow", "left_wrist"],
+      "alt_keypoints": ["right_shoulder", "right_elbow", "right_wrist"],
+      "down_threshold": 160.0,
+      "up_threshold": 100.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 170.0,
+          "right_elbow": 170.0
+        },
+        "tolerances": {
+          "left_elbow": 25.0,
+          "right_elbow": 25.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Hang with arms fully extended",
+          "right_elbow": "Hang with arms fully extended"
+        }
+      },
+      "checks": {
+        "incomplete_pull": {"max_up_angle": 110.0}
+      }
+    },
+    "Squats": {
+      "type": "REP_BASED",
+      "category": "LOWER BODY",
+      "primary_joint": "knee",
+      "keypoints": ["left_hip", "left_knee", "left_ankle"],
+      "alt_keypoints": ["right_hip", "right_knee", "right_ankle"],
+      "down_threshold": 155.0,
+      "up_threshold": 110.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_knee": 175.0,
+          "right_knee": 175.0,
+          "torso": 180.0
+        },
+        "tolerances": {
+          "left_knee": 30.0,
+          "right_knee": 30.0,
+          "torso": 25.0
+        },
+        "coaching_rules": {
+          "left_knee": "Stand tall with legs extended",
+          "right_knee": "Stand tall with legs extended",
+          "torso": "Keep your back straight and chest up"
+        }
+      },
+      "checks": {
+        "knee_valgus": {"max_knee_inward": 20.0},
+        "insufficient_depth": {"min_up_angle": 115.0},
+        "excessive_forward_lean": {"max_torso_angle": 45.0}
+      }
+    },
+    "Lunges": {
+      "type": "REP_BASED",
+      "category": "LOWER BODY",
+      "primary_joint": "knee",
+      "keypoints": ["left_hip", "left_knee", "left_ankle"],
+      "alt_keypoints": ["right_hip", "right_knee", "right_ankle"],
+      "down_threshold": 155.0,
+      "up_threshold": 110.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_knee": 170.0,
+          "right_knee": 170.0,
+          "torso": 180.0
+        },
+        "tolerances": {
+          "left_knee": 20.0,
+          "right_knee": 20.0,
+          "torso": 20.0
+        },
+        "coaching_rules": {
+          "left_knee": "Stand upright with feet hips-width apart",
+          "right_knee": "Stand upright with feet hips-width apart",
+          "torso": "Keep your torso tall and straight"
+        }
+      },
+      "checks": {
+        "knee_over_toe": {"max_forward_knee": 30.0}
+      }
+    },
+    "Calf Raises": {
+      "type": "REP_BASED",
+      "category": "LOWER BODY",
+      "primary_joint": "ankle",
+      "keypoints": ["left_knee", "left_ankle", "left_foot_index"],
+      "alt_keypoints": ["right_knee", "right_ankle", "right_foot_index"],
+      "down_threshold": 170.0,
+      "up_threshold": 150.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_knee": 175.0,
+          "right_knee": 175.0,
+          "left_ankle": 170.0
+        },
+        "tolerances": {
+          "left_knee": 15.0,
+          "right_knee": 15.0,
+          "left_ankle": 20.0
+        },
+        "coaching_rules": {
+          "left_knee": "Stand with straight knees",
+          "right_knee": "Stand with straight knees",
+          "left_ankle": "Keep feet flat on the ground"
+        }
+      },
+      "checks": {
+        "insufficient_height": {"min_extension": 155.0}
+      }
+    },
+    "Russian Twists": {
+      "type": "REP_BASED",
+      "category": "CORE",
+      "primary_joint": "hip",
+      "keypoints": ["left_shoulder", "left_hip", "left_knee"],
+      "alt_keypoints": ["right_shoulder", "right_hip", "right_knee"],
+      "down_threshold": 140.0,
+      "up_threshold": 100.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "hip": 140.0,
+          "left_knee": 90.0
+        },
+        "tolerances": {
+          "hip": 20.0,
+          "left_knee": 25.0
+        },
+        "coaching_rules": {
+          "hip": "Sit leaning back slightly at 45 degrees",
+          "left_knee": "Keep knees bent and feet together"
+        }
+      },
+      "checks": {
+        "posture_slouch": {"max_torso_angle": 35.0}
+      }
+    },
+    "Crunches": {
+      "type": "REP_BASED",
+      "category": "CORE",
+      "primary_joint": "hip",
+      "keypoints": ["left_shoulder", "left_hip", "left_knee"],
+      "alt_keypoints": ["right_shoulder", "right_hip", "right_knee"],
+      "down_threshold": 140.0,
+      "up_threshold": 100.0,
+      "target_reps": 10,
+      "cooldown": 0.8,
+      "alignment": {
+        "starting_pose_angles": {
+          "hip": 140.0,
+          "left_knee": 90.0
+        },
+        "tolerances": {
+          "hip": 20.0,
+          "left_knee": 25.0
+        },
+        "coaching_rules": {
+          "hip": "Lie back with shoulders down",
+          "left_knee": "Bend knees at 90 degrees"
+        }
+      },
+      "checks": {
+        "neck_strain": {"max_neck_flexion": 35.0}
+      }
+    },
+    "Mountain Climbers": {
+      "type": "REP_BASED",
+      "category": "CORE",
+      "primary_joint": "hip",
+      "keypoints": ["left_shoulder", "left_hip", "left_knee"],
+      "alt_keypoints": ["right_shoulder", "right_hip", "right_knee"],
+      "down_threshold": 140.0,
+      "up_threshold": 100.0,
+      "target_reps": 10,
+      "cooldown": 0.5,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 170.0,
+          "hip": 170.0
+        },
+        "tolerances": {
+          "left_elbow": 20.0,
+          "hip": 20.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Hold high plank position with straight arms",
+          "hip": "Keep hips level with shoulders"
+        }
+      },
+      "checks": {
+        "bouncing_hips": {"max_vertical_hip_shift": 40.0}
+      }
+    },
+    "Jumping Jacks": {
+      "type": "REP_BASED",
+      "category": "FULL BODY / CARDIO",
+      "primary_joint": "shoulder_hip",
+      "keypoints": ["left_shoulder", "left_hip", "left_knee"],
+      "alt_keypoints": ["right_shoulder", "right_hip", "right_knee"],
+      "down_threshold": 150.0,
+      "up_threshold": 120.0,
+      "target_reps": 10,
+      "cooldown": 0.6,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_elbow": 170.0,
+          "right_elbow": 170.0,
+          "left_knee": 170.0
+        },
+        "tolerances": {
+          "left_elbow": 20.0,
+          "right_elbow": 20.0,
+          "left_knee": 20.0
+        },
+        "coaching_rules": {
+          "left_elbow": "Stand straight with arms at your sides",
+          "right_elbow": "Keep arms fully extended downward",
+          "left_knee": "Feet together with straight legs"
+        }
+      },
+      "checks": {
+        "partial_arm_raise": {"min_arm_angle": 130.0}
+      }
+    },
+    "High Knees": {
+      "type": "REP_BASED",
+      "category": "FULL BODY / CARDIO",
+      "primary_joint": "hip",
+      "keypoints": ["left_shoulder", "left_hip", "left_knee"],
+      "alt_keypoints": ["right_shoulder", "right_hip", "right_knee"],
+      "down_threshold": 150.0,
+      "up_threshold": 120.0,
+      "target_reps": 10,
+      "cooldown": 0.5,
+      "alignment": {
+        "starting_pose_angles": {
+          "left_knee": 170.0,
+          "right_knee": 170.0,
+          "torso": 180.0
+        },
+        "tolerances": {
+          "left_knee": 20.0,
+          "right_knee": 20.0,
+          "torso": 15.0
+        },
+        "coaching_rules": {
+          "left_knee": "Stand upright ready to lift knees",
+          "right_knee": "Keep legs extended at start",
+          "torso": "Maintain tall torso posture"
+        }
+      },
+      "checks": {
+        "low_knee_height": {"min_hip_angle": 130.0}
+      }
+    }
+  }
+}

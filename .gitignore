@@ -1,0 +1,24 @@
+# Node / Frontend Build & Dependencies
+node_modules/
+dist/
+.pnpm-store/
+*.log
+
+# Python / Backend Runtime & Cache
+__pycache__/
+*.pyc
+.pytest_cache/
+.venv/
+venv/
+*.db
+
+# Local Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+
+# IDE & OS Generated Files
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
