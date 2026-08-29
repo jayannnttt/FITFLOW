@@ -43,7 +43,7 @@ app = FastAPI(title="AI Fitness Coach API Server", version="2.0.0")
 # Configure CORS via ALLOWED_ORIGINS environment variable or default dev origins
 allowed_origins_env = os.getenv("ALLOWED_ORIGINS", "")
 if allowed_origins_env:
-    allowed_origins = [origin.strip() for origin in allowed_origins_env.split(",") if origin.strip()]
+    allowed_origins = [origin.strip().rstrip('/') for origin in allowed_origins_env.split(",") if origin.strip()]
 else:
     allowed_origins = [
         "http://localhost:5173",
@@ -52,13 +52,19 @@ else:
         "http://127.0.0.1:8000",
     ]
 
+allow_creds = True
+if "*" in allowed_origins:
+    allow_creds = False
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-    allow_credentials=True,
+    allow_origin_regex=r"https://.*\.vercel\.app",
+    allow_credentials=allow_creds,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 # System Components
 exercises_config = load_exercise_configs(config.exercises_config_path)

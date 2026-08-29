@@ -28,9 +28,16 @@ export default function HomeScreen({ onNavigate, onSelectCategory }: Props) {
         setLoading(true)
         setError(null)
         const [cats, hist] = await Promise.all([
-          fetchCategories().catch(() => []),
-          fetchHistory().catch(() => []),
+          fetchCategories().catch((err) => {
+            console.error('[API Error] fetchCategories failed:', err)
+            return []
+          }),
+          fetchHistory().catch((err) => {
+            console.error('[API Error] fetchHistory failed:', err)
+            return []
+          }),
         ])
+
         if (isMounted) {
           setCategories(cats)
           setHistory(hist)

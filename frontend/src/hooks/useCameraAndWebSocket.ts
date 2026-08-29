@@ -94,9 +94,17 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) return
 
     const defaultWsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws/workout`
-    const wsBaseUrl = import.meta.env.VITE_WS_BASE_URL
+    let wsBaseUrl = (import.meta.env.VITE_WS_BASE_URL || '').trim().replace(/\/+$/, '')
+    if (wsBaseUrl) {
+      if (wsBaseUrl.startsWith('https://')) {
+        wsBaseUrl = wsBaseUrl.replace('https://', 'wss://')
+      } else if (wsBaseUrl.startsWith('http://')) {
+        wsBaseUrl = wsBaseUrl.replace('http://', 'ws://')
+      }
+    }
     const wsUrl = wsBaseUrl ? `${wsBaseUrl}/ws/workout` : defaultWsUrl
     const ws = new WebSocket(wsUrl)
+
     wsRef.current = ws
 
     ws.onopen = () => {
