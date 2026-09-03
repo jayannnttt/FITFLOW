@@ -255,11 +255,11 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
     const w = canvas.width
     const h = canvas.height
 
-    // Draw Ghost Skeleton Overlay (Neon Cyan)
+    // Draw Ghost Skeleton Overlay (Neutral Off-White Guide)
     if (alignment.ghost_keypoints && Object.keys(alignment.ghost_keypoints).length > 0) {
       ctx.save()
-      ctx.strokeStyle = 'rgba(6, 182, 212, 0.55)'
-      ctx.lineWidth = 4
+      ctx.strokeStyle = 'rgba(232, 232, 232, 0.4)'
+      ctx.lineWidth = 3
       ctx.lineCap = 'round'
 
       SKELETON_CONNECTIONS.forEach(([start, end]) => {
@@ -273,10 +273,10 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
         }
       })
 
-      ctx.fillStyle = 'rgba(147, 197, 253, 0.7)'
+      ctx.fillStyle = 'rgba(232, 232, 232, 0.6)'
       Object.values(alignment.ghost_keypoints).forEach((kp) => {
         ctx.beginPath()
-        ctx.arc(kp.x * w, kp.y * h, 6, 0, 2 * Math.PI)
+        ctx.arc(kp.x * w, kp.y * h, 5, 0, 2 * Math.PI)
         ctx.fill()
       })
       ctx.restore()
@@ -285,13 +285,13 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
     // Draw Live User Skeleton (Color-Coded by Joint Status / Confidence)
     if (keypoints && Object.keys(keypoints).length > 0) {
       const colorMap: Record<string, string> = {
-        correct: '#10B981',
-        adjusting: '#F59E0B',
-        incorrect: '#EF4444',
+        correct: '#34c759',
+        adjusting: '#f5a623',
+        incorrect: '#e8491d',
       }
 
       ctx.save()
-      ctx.lineWidth = 4
+      ctx.lineWidth = 3
       ctx.lineCap = 'round'
 
       SKELETON_CONNECTIONS.forEach(([start, end]) => {
@@ -307,7 +307,7 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
               ? 'adjusting'
               : 'correct'
 
-          ctx.strokeStyle = colorMap[status] || '#10B981'
+          ctx.strokeStyle = colorMap[status] || '#34c759'
           ctx.beginPath()
           ctx.moveTo(p1.x * w, p1.y * h)
           ctx.lineTo(p2.x * w, p2.y * h)
@@ -322,9 +322,9 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
           const cy = kp.y * h
           const status = alignment.joint_statuses[name] || 'correct'
 
-          ctx.fillStyle = colorMap[status] || '#10B981'
+          ctx.fillStyle = colorMap[status] || '#34c759'
           ctx.beginPath()
-          ctx.arc(cx, cy, 7, 0, 2 * Math.PI)
+          ctx.arc(cx, cy, 6, 0, 2 * Math.PI)
           ctx.fill()
           ctx.strokeStyle = '#FFFFFF'
           ctx.lineWidth = 1.5
@@ -334,9 +334,9 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
           if (tracking.joint_angles && tracking.joint_angles[name]) {
             const angTxt = tracking.joint_angles[name]
             ctx.save()
-            ctx.font = 'bold 11px Inter, system-ui, sans-serif'
-            ctx.fillStyle = 'rgba(9, 13, 22, 0.85)'
-            ctx.strokeStyle = '#06B6D4'
+            ctx.font = '600 11px "Space Grotesk", sans-serif'
+            ctx.fillStyle = 'rgba(17, 17, 17, 0.9)'
+            ctx.strokeStyle = '#2a2a2a'
             ctx.lineWidth = 1
             const tw = ctx.measureText(angTxt).width
             const pad = 5
@@ -347,7 +347,7 @@ export function useCameraAndWebSocket(exerciseName: string | null, active: boole
             ctx.rect(rx, ry - 14, tw + pad * 2, 18)
             ctx.fill()
             ctx.stroke()
-            ctx.fillStyle = '#60A5FA'
+            ctx.fillStyle = '#e8e8e8'
             ctx.fillText(angTxt, rx + pad, ry - 1)
             ctx.restore()
           }

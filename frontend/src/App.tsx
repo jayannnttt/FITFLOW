@@ -113,7 +113,7 @@ export default function App() {
   }
 
   return (
-    <div className="h-full bg-mesh relative">
+    <div className="h-full relative" style={{ background: 'var(--background)' }}>
       {/* Persistent Hidden/Active Video & Canvas Element Layer */}
       <div className={`absolute inset-0 z-0 ${isSessionActive ? 'block' : 'hidden'}`}>
         <video

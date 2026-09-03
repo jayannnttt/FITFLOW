@@ -15,7 +15,12 @@ function formatDuration(sec: number): string {
   return `${m.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`
 }
 
-export default function SummaryScreen({ summary: initialSummary, exerciseName, onTryAgain, onHome }: Props) {
+export default function SummaryScreen({
+  summary: initialSummary,
+  exerciseName,
+  onTryAgain,
+  onHome,
+}: Props) {
   const [summaryData, setSummaryData] = useState<SessionSummary | null>(initialSummary)
   const [loading, setLoading] = useState(!initialSummary)
 
@@ -36,7 +41,9 @@ export default function SummaryScreen({ summary: initialSummary, exerciseName, o
       }
     }
     loadSummary()
-    return () => { isMounted = false }
+    return () => {
+      isMounted = false
+    }
   }, [initialSummary])
 
   const reps = summaryData?.reps || 0
@@ -44,69 +51,115 @@ export default function SummaryScreen({ summary: initialSummary, exerciseName, o
   const formScore = summaryData?.form_score || 0
   const calories = summaryData?.calories_burned || Math.max(1, Math.round(reps * 0.8))
 
-  const scoreColor = formScore >= 80 ? '#10B981' : formScore >= 60 ? '#F59E0B' : '#EF4444'
+  const scoreColor =
+    formScore >= 80 ? 'var(--success)' : formScore >= 60 ? 'var(--warning)' : 'var(--error)'
 
   return (
-    <div className="h-full flex items-center justify-center bg-mesh px-5 py-8 overflow-y-auto">
-      <div className="glass-strong rounded-3xl p-6 sm:p-10 max-w-lg w-full text-center space-y-8 animate-fade-up border border-white/12 shadow-[0_20px_80px_rgba(0,0,0,0.7)] relative overflow-hidden">
-        {/* Background Radial Glow */}
-        <div
-          className="absolute -top-30 -right-30 w-72 h-72 rounded-full opacity-20 pointer-events-none"
-          style={{ background: 'radial-gradient(circle, #10B981 0%, transparent 70%)' }}
-        />
-
-        {/* Celebration Trophy Header */}
-        <div className="space-y-3">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-3xl mx-auto shadow-[0_0_30px_rgba(16,185,129,0.2)]">
-            🏅
+    <div className="h-full flex items-center justify-center px-6 py-8 overflow-y-auto">
+      <div
+        className="p-6 sm:p-8 max-w-[480px] w-full text-center space-y-6 animate-fade-up"
+        style={{
+          background: 'var(--card)',
+          border: '1px solid var(--border)',
+          borderRadius: 'var(--radius)',
+        }}
+      >
+        {/* Header */}
+        <div className="space-y-1">
+          <div className="text-2xl font-bold leading-none mb-2" style={{ color: 'var(--success)' }}>
+            ✓
           </div>
-          <h1 className="font-black text-3xl text-white/95 tracking-tight">Workout Complete!</h1>
-          <p className="text-xs font-mono text-white/40 uppercase tracking-widest">
-            {exerciseName} • Performance Breakdown
+          <h1 className="font-bold text-[28px] text-white tracking-tight leading-tight">
+            WORKOUT COMPLETE
+          </h1>
+          <p className="text-[13px]" style={{ color: 'var(--muted-foreground)' }}>
+            {exerciseName}
           </p>
         </div>
 
-        {/* Metrics Grid */}
+        {/* Metrics Grid (4 items) */}
         {loading ? (
-          <div className="grid grid-cols-2 gap-4 animate-pulse">
+          <div className="grid grid-cols-2 gap-3">
             {Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white/4 rounded-2xl p-5 border border-white/8 h-24" />
+              <div
+                key={i}
+                className="skeleton-shimmer h-[80px]"
+                style={{
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                }}
+              />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-3">
             {/* Reps */}
-            <div className="bg-white/4 rounded-2xl p-5 border border-white/8 text-center space-y-1">
-              <div className="font-mono font-black text-3xl text-cyan-400">{reps}</div>
-              <div className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
+            <div
+              className="p-4 text-center"
+              style={{
+                background: 'var(--secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="font-display font-extrabold text-[36px] text-white leading-none">
+                {reps}
+              </div>
+              <div className="text-[11px] uppercase tracking-wider mt-1" style={{ color: 'var(--muted-foreground)' }}>
                 Total Reps
               </div>
             </div>
 
             {/* Duration */}
-            <div className="bg-white/4 rounded-2xl p-5 border border-white/8 text-center space-y-1">
-              <div className="font-mono font-black text-3xl text-purple-400">
+            <div
+              className="p-4 text-center"
+              style={{
+                background: 'var(--secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="font-display font-extrabold text-[36px] text-white leading-none">
                 {formatDuration(durationSec)}
               </div>
-              <div className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
+              <div className="text-[11px] uppercase tracking-wider mt-1" style={{ color: 'var(--muted-foreground)' }}>
                 Duration
               </div>
             </div>
 
             {/* Form Score */}
-            <div className="bg-white/4 rounded-2xl p-5 border border-white/8 text-center space-y-1">
-              <div className="font-mono font-black text-3xl" style={{ color: scoreColor }}>
-                {formScore}%
+            <div
+              className="p-4 text-center"
+              style={{
+                background: 'var(--secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div
+                className="font-display font-extrabold text-[36px] leading-none"
+                style={{ color: scoreColor }}
+              >
+                {Math.round(formScore)}%
               </div>
-              <div className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
+              <div className="text-[11px] uppercase tracking-wider mt-1" style={{ color: 'var(--muted-foreground)' }}>
                 Form Score
               </div>
             </div>
 
             {/* Calories Burned */}
-            <div className="bg-white/4 rounded-2xl p-5 border border-white/8 text-center space-y-1">
-              <div className="font-mono font-black text-3xl text-amber-400">{calories}</div>
-              <div className="font-mono text-[10px] text-white/40 uppercase tracking-wider">
+            <div
+              className="p-4 text-center"
+              style={{
+                background: 'var(--secondary)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="font-display font-extrabold text-[36px] text-white leading-none">
+                {calories}
+              </div>
+              <div className="text-[11px] uppercase tracking-wider mt-1" style={{ color: 'var(--muted-foreground)' }}>
                 Calories (kcal)
               </div>
             </div>
@@ -117,15 +170,21 @@ export default function SummaryScreen({ summary: initialSummary, exerciseName, o
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
           <button
             onClick={onTryAgain}
-            className="w-full sm:w-1/2 py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider uppercase bg-white/5 hover:bg-white/10 text-white/80 border border-white/10 transition-colors"
+            className="w-full sm:w-1/2 py-3 text-[13px] font-semibold uppercase tracking-wider cursor-pointer transition-colors"
+            style={{
+              background: 'var(--secondary)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              color: 'var(--foreground)',
+            }}
           >
-            ↻ TRY AGAIN
+            TRY AGAIN
           </button>
           <button
             onClick={onHome}
-            className="w-full sm:w-1/2 py-3.5 rounded-xl font-mono text-xs font-bold tracking-wider uppercase text-black bg-cyan-400 hover:bg-cyan-300 transition-all shadow-[0_0_25px_rgba(0,212,255,0.3)]"
+            className="select-btn w-full sm:w-1/2 py-3 text-[13px] font-semibold uppercase tracking-wider cursor-pointer"
           >
-            ← BACK TO HOME
+            BACK TO HOME
           </button>
         </div>
       </div>

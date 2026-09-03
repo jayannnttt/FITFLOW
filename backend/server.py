@@ -16,13 +16,17 @@ import time
 import cv2
 import numpy as np
 from typing import Dict, Any, Optional
+import datetime
+import re
+import smtplib
+from email.mime.text import MIMEText
+from pydantic import BaseModel, Field
 
 from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from config import AppConfig
-from pose.detector_factory import DetectorFactory
 from pose.pose_filter import PoseFilterManager
 from pose.angles import AngleEngine
 from exercises.exercise_factory import ExerciseFactory
@@ -68,12 +72,21 @@ app.add_middleware(
 
 # System Components
 exercises_config = load_exercise_configs(config.exercises_config_path)
-detector = DetectorFactory.create_detector(
-    config.pose_backend,
-    min_detection_confidence=config.min_detection_confidence,
-    min_tracking_confidence=config.min_tracking_confidence,
-    model_complexity=config.model_complexity
-)
+_detector = None
+
+
+def get_detector():
+    """Lazy-load MediaPipe Pose Detector only when workout inference is required."""
+    global _detector
+    if _detector is None:
+        from pose.detector_factory import DetectorFactory
+        _detector = DetectorFactory.create_detector(
+            config.pose_backend,
+            min_detection_confidence=config.min_detection_confidence,
+            min_tracking_confidence=config.min_tracking_confidence,
+            model_complexity=config.model_complexity
+        )
+    return _detector
 pose_filter = PoseFilterManager(
     method=config.smoothing_method,
     window_size=config.moving_average_window,
@@ -99,6 +112,7 @@ class SessionState:
         self.active_exercise: Optional[BaseExercise] = None
         self.exercise_name: Optional[str] = None
         self.session_start_time: float = 0.0
+        self.workout_start_time: float = 0.0
         self.performance_score: float = 0.0
         self.smoothness_score: float = 0.0
         self.depth_score: float = 0.0
@@ -112,6 +126,7 @@ class SessionState:
             self.exercise_name = name
             self.active_exercise = ExerciseFactory.create_exercise(name, ex_cfg)
             self.session_start_time = time.time()
+            self.workout_start_time = 0.0
             self.performance_score = 0.0
             self.smoothness_score = 0.0
             self.depth_score = 0.0
@@ -155,7 +170,10 @@ def get_latest_summary():
         return JSONResponse(content={"has_summary": False})
 
     metrics = session_state.active_exercise.get_display_metrics()
-    elapsed = time.time() - session_state.session_start_time
+    if session_state.workout_start_time > 0:
+        elapsed = time.time() - session_state.workout_start_time
+    else:
+        elapsed = time.time() - session_state.session_start_time
     
     cal_burned = max(1, int((elapsed / 60.0) * 10.5))
     
@@ -167,6 +185,60 @@ def get_latest_summary():
         "duration_sec": int(elapsed),
         "form_score": int(session_state.performance_score),
         "calories_burned": cal_burned
+    })
+
+
+class ExerciseRequestPayload(BaseModel):
+    exercise: str = Field(..., min_length=1, max_length=100)
+    timestamp: Optional[str] = None
+
+
+@app.post("/api/request-exercise")
+@app.post("/api/exercise-request")
+@app.post("/exercise-request")
+@app.post("/request-exercise")
+def request_exercise_endpoint(payload: ExerciseRequestPayload):
+    """Receive an exercise request and dispatch an email notification to admin."""
+    sanitized_name = re.sub(r"[\r\n\x00]", " ", payload.exercise).strip()
+    if not sanitized_name:
+        raise HTTPException(status_code=400, detail="Exercise name cannot be empty.")
+
+    timestamp = payload.timestamp or datetime.datetime.now(datetime.timezone.utc).isoformat()
+
+    smtp_host = os.getenv("SMTP_HOST", "")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_password = os.getenv("SMTP_PASSWORD", "")
+    notification_email = os.getenv("NOTIFICATION_EMAIL") or "jayannnttt.s@gmail.com"
+    smtp_tls = os.getenv("SMTP_TLS", "true").lower() in ("true", "1", "yes")
+
+    subject = "FITFLOW — New Exercise Request"
+    body = f"New exercise requested:\n{sanitized_name}"
+
+    if smtp_host and smtp_user and smtp_password and notification_email:
+        try:
+            msg = MIMEText(body, "plain", "utf-8")
+            msg["Subject"] = subject
+            msg["From"] = smtp_user
+            msg["To"] = notification_email
+
+            with smtplib.SMTP(smtp_host, smtp_port, timeout=10) as server:
+                if smtp_tls:
+                    server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.send_message(msg)
+
+            print(f"[EXERCISE REQUEST] Email sent for '{sanitized_name}' to {notification_email}")
+        except Exception as e:
+            print(f"[EXERCISE REQUEST ERROR] Failed to send email: {e}")
+            raise HTTPException(status_code=500, detail="Failed to send email notification. Please verify SMTP settings.")
+    else:
+        print(f"[EXERCISE REQUEST] Logged request for '{sanitized_name}' at {timestamp} -> Destination: {notification_email} (SMTP credentials not configured)")
+
+    return JSONResponse(content={
+        "success": True,
+        "message": "Exercise request submitted successfully!",
+        "exercise": sanitized_name
     })
 
 
@@ -199,14 +271,17 @@ async def websocket_workout_endpoint(websocket: WebSocket):
                             "exercise": ex_name
                         })
                     elif cmd == "start_active_tracking":
+                        now_ts = time.time()
+                        session_state.workout_start_time = now_ts
                         if session_state.active_exercise:
-                            session_state.active_exercise.start_tracking(time.time())
+                            session_state.active_exercise.start_tracking(now_ts)
                         await websocket.send_json({
                             "type": "status",
                             "status": "tracking_active"
                         })
                     elif cmd == "reset":
                         alignment_engine.reset()
+                        session_state.workout_start_time = time.time()
                         if session_state.active_exercise:
                             session_state.active_exercise.reset()
                         await websocket.send_json({"type": "status", "status": "reset"})
@@ -236,10 +311,10 @@ async def websocket_workout_endpoint(websocket: WebSocket):
                     })
                     continue
 
-                # Run pose detection
+                # Run pose detection (lazy-initializes MediaPipe on first active frame)
                 h, w = frame.shape[:2]
 
-                keypoints = detector.detect(frame, now)
+                keypoints = get_detector().detect(frame, now)
                 keypoints_dict = {}
                 if keypoints:
                     keypoints = pose_filter.filter_pose(keypoints, now)
@@ -336,6 +411,8 @@ async def websocket_workout_endpoint(websocket: WebSocket):
                             reason_not_ready = f"Stabilizing posture ({int(alignment_res.stabilization_progress * 100)}% complete)"
 
                     if not is_aligning:
+                        if session_state.workout_start_time == 0.0:
+                            session_state.workout_start_time = now
                         prev_reps = session_state.active_exercise.get_display_metrics().get("reps", 0)
                         session_state.active_exercise.update(keypoints, angle_engine, frame.shape[:2], now)
                         
@@ -344,6 +421,12 @@ async def websocket_workout_endpoint(websocket: WebSocket):
                         tracking_data["sets"] = metrics.get("sets", 0)
                         tracking_data["finished"] = metrics.get("finished", False)
                         tracking_data["current_angle"] = metrics.get("current_angle", None)
+
+                        # Compute and update live elapsed workout time
+                        if "elapsed_time" in metrics and metrics["elapsed_time"] > 0:
+                            tracking_data["elapsed_time"] = metrics["elapsed_time"]
+                        else:
+                            tracking_data["elapsed_time"] = round(now - session_state.workout_start_time, 1)
 
                         if session_state.active_exercise.state == ExerciseState.REP_COMPLETED and tracking_data["reps"] != prev_reps:
                             analysis = session_state.performance_analyzer.analyze_rep(

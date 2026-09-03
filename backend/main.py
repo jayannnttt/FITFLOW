@@ -7,14 +7,17 @@ import webbrowser
 import uvicorn
 from config import AppConfig
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 def main():
     config = AppConfig()
     host = getattr(config, "server_host", "127.0.0.1")
     port = getattr(config, "server_port", 8000)
 
     url = f"http://{host}:{port}"
-    print(f"\n=======================================================")
-    print(f"🚀 AI Fitness Coach Web Application Launching")
+    print("\n=======================================================")
+    print("AI Fitness Coach Web Application Launching")
     print(f"URL: {url}")
     print(f"Camera & MediaPipe will initialize on demand when starting a workout.")
     print(f"=======================================================\n")

@@ -7,72 +7,43 @@ interface Props {
 
 const STATE_CONFIG: Record<
   WorkoutState,
-  { label: string; bg: string; text: string; border: string; dot: string; glow?: string }
+  { label: string; color: string }
 > = {
   IDLE: {
     label: 'IDLE',
-    bg: 'rgba(255, 255, 255, 0.05)',
-    text: 'rgba(240, 240, 248, 0.5)',
-    border: 'rgba(255, 255, 255, 0.1)',
-    dot: 'rgba(240, 240, 248, 0.3)',
+    color: 'var(--muted-foreground)',
   },
   ALIGNING: {
-    label: 'CALIBRATING POSTURE',
-    bg: 'rgba(245, 158, 11, 0.12)',
-    text: '#F59E0B',
-    border: 'rgba(245, 158, 11, 0.3)',
-    dot: '#F59E0B',
+    label: 'CALIBRATING',
+    color: 'var(--warning)',
   },
   READY: {
-    label: 'POSTURE CONFIRMED — READY',
-    bg: 'rgba(16, 185, 129, 0.15)',
-    text: '#10B981',
-    border: 'rgba(16, 185, 129, 0.4)',
-    dot: '#10B981',
-    glow: '0 0 20px rgba(16, 185, 129, 0.3)',
+    label: 'READY',
+    color: 'var(--success)',
   },
   STARTED: {
-    label: 'ACTIVE TRACKING',
-    bg: 'rgba(0, 212, 255, 0.12)',
-    text: '#00d4ff',
-    border: 'rgba(0, 212, 255, 0.3)',
-    dot: '#00d4ff',
+    label: 'ACTIVE',
+    color: 'var(--primary)',
   },
   DOWN: {
     label: 'ECCENTRIC (DOWN)',
-    bg: 'rgba(0, 212, 255, 0.15)',
-    text: '#00d4ff',
-    border: 'rgba(0, 212, 255, 0.4)',
-    dot: '#00d4ff',
+    color: 'var(--primary)',
   },
   UP: {
     label: 'CONCENTRIC (UP)',
-    bg: 'rgba(123, 47, 255, 0.15)',
-    text: '#7b2fff',
-    border: 'rgba(123, 47, 255, 0.4)',
-    dot: '#7b2fff',
+    color: 'var(--primary)',
   },
   REP_COMPLETED: {
-    label: 'REP COMPLETED ✓',
-    bg: 'rgba(16, 185, 129, 0.2)',
-    text: '#10B981',
-    border: 'rgba(16, 185, 129, 0.5)',
-    dot: '#10B981',
-    glow: '0 0 25px rgba(16, 185, 129, 0.4)',
+    label: 'REP COMPLETE',
+    color: 'var(--primary)',
   },
   FINISHED: {
-    label: 'SESSION COMPLETE',
-    bg: 'rgba(123, 47, 255, 0.2)',
-    text: '#a855f7',
-    border: 'rgba(123, 47, 255, 0.4)',
-    dot: '#a855f7',
+    label: 'FINISHED',
+    color: 'var(--muted-foreground)',
   },
   RESET: {
     label: 'RESET',
-    bg: 'rgba(255, 255, 255, 0.1)',
-    text: '#ffffff',
-    border: 'rgba(255, 255, 255, 0.2)',
-    dot: '#ffffff',
+    color: 'var(--muted-foreground)',
   },
 }
 
@@ -81,19 +52,16 @@ export default function StatusPill({ state }: Props) {
 
   return (
     <div
-      className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-mono tracking-wider font-semibold transition-all duration-300"
+      className="inline-flex items-center px-2.5 py-1 text-[11px] font-semibold uppercase"
       style={{
-        background: cfg.bg,
-        color: cfg.text,
-        border: `1px solid ${cfg.border}`,
-        boxShadow: cfg.glow,
+        background: 'var(--secondary)',
+        border: '1px solid var(--border)',
+        borderRadius: 'var(--radius)',
+        color: cfg.color,
+        letterSpacing: '0.1em',
       }}
     >
-      <span
-        className="w-1.5 h-1.5 rounded-full animate-pulse flex-shrink-0"
-        style={{ background: cfg.dot }}
-      />
-      <span>{cfg.label}</span>
+      {cfg.label}
     </div>
   )
 }

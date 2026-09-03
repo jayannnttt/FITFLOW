@@ -14,38 +14,46 @@ interface Props {
 
 export default function CalibrationScreen({
   exerciseName,
-  config,
   alignment,
-  wsConnected,
-  cameraActive,
   error,
   startActiveTracking,
   onCancel,
 }: Props) {
-  const scoreColor = alignment.score >= 80 ? '#10B981' : alignment.score >= 50 ? '#F59E0B' : '#EF4444'
-  const fillPercent = Math.min(100, alignment.score)
+  const fillPercent = Math.min(100, Math.max(0, alignment.score))
 
   const coachingText =
     alignment.coaching_messages && alignment.coaching_messages.length > 0
       ? alignment.coaching_messages[0]
-      : 'Step into camera view and align your body with the Ghost Skeleton target pose.'
+      : 'Step into camera view and align your posture.'
 
   return (
     <div className="h-full flex flex-col overflow-hidden relative">
       {/* Top HUD Header */}
-      <div className="absolute top-0 inset-x-0 z-30 px-5 md:px-8 py-4 flex items-center justify-between bg-gradient-to-b from-black/90 via-black/50 to-transparent">
-        <div className="flex items-center gap-3">
+      <div
+        className="absolute top-0 inset-x-0 z-30 px-6 md:px-8 py-3.5 flex items-center justify-between"
+        style={{
+          background: 'var(--card)',
+          borderBottom: '1px solid var(--border)',
+        }}
+      >
+        <div className="flex items-center gap-4">
           <button
             onClick={onCancel}
-            className="px-3 py-1.5 rounded-xl bg-white/5 hover:bg-white/10 text-white/60 hover:text-white text-xs font-mono tracking-wider transition-colors border border-white/10"
+            className="text-[12px] font-medium transition-colors cursor-pointer hover:text-white"
+            style={{ color: 'var(--muted-foreground)' }}
           >
-            ← CANCEL
+            ← Cancel
           </button>
           <div>
-            <div className="font-mono text-[10px] text-cyan-400 tracking-widest uppercase">
+            <div
+              className="text-[11px] uppercase tracking-wider font-medium"
+              style={{ color: 'var(--muted-foreground)' }}
+            >
               POSTURE CALIBRATION
             </div>
-            <h1 className="font-black text-lg text-white/95 tracking-tight">{exerciseName}</h1>
+            <h1 className="font-bold text-[18px] text-white tracking-tight leading-none mt-0.5">
+              {exerciseName}
+            </h1>
           </div>
         </div>
 
@@ -53,79 +61,103 @@ export default function CalibrationScreen({
         <StatusPill state={alignment.ready ? 'READY' : 'ALIGNING'} />
       </div>
 
-      {/* Viewport Overlay Effects */}
+      {/* Main Viewport Container */}
       <div className="relative flex-1 min-h-0 w-full h-full flex items-center justify-center overflow-hidden">
-        {/* Calibration Scanline effect */}
-        <div className="calib-scanline pointer-events-none z-20" />
-
         {/* Error overlay if camera or WebSocket fails */}
         {error && (
-          <div className="absolute inset-0 z-40 bg-black/90 flex items-center justify-center p-6">
-            <div className="glass-strong rounded-2xl p-8 max-w-md text-center border border-rose-500/30">
-              <div className="text-4xl mb-4 text-rose-500">📷</div>
-              <h2 className="font-bold text-lg text-white/90 mb-2">Camera Access Required</h2>
-              <p className="text-xs text-white/50 mb-6">{error}</p>
+          <div
+            className="absolute inset-0 z-40 flex items-center justify-center p-6"
+            style={{ background: 'rgba(0, 0, 0, 0.85)' }}
+          >
+            <div
+              className="p-6 max-w-md w-full text-center space-y-4"
+              style={{
+                background: 'var(--card)',
+                border: '1px solid var(--error)',
+                borderRadius: 'var(--radius)',
+              }}
+            >
+              <div className="font-bold text-lg" style={{ color: 'var(--error)' }}>
+                Camera Access Required
+              </div>
+              <p className="text-[13px]" style={{ color: 'var(--secondary-foreground)' }}>
+                {error}
+              </p>
               <button
                 onClick={onCancel}
-                className="w-full py-3 rounded-xl font-bold text-xs bg-rose-500/15 text-rose-400 border border-rose-500/30 hover:bg-rose-500/25 transition-colors"
+                className="w-full py-2.5 text-[13px] font-semibold cursor-pointer"
+                style={{
+                  background: 'var(--secondary)',
+                  border: '1px solid var(--border)',
+                  borderRadius: 'var(--radius)',
+                  color: 'var(--foreground)',
+                }}
               >
-                Return to Home
+                Return to Library
               </button>
             </div>
           </div>
         )}
       </div>
 
-      {/* Bottom Alignment HUD & Coaching Card */}
-      <div className="absolute bottom-0 inset-x-0 z-30 p-5 md:p-8 bg-gradient-to-t from-black/95 via-black/80 to-transparent">
-        <div className="max-w-2xl mx-auto space-y-4">
+      {/* Bottom Alignment HUD & Coaching Panel */}
+      <div className="absolute bottom-0 inset-x-0 z-30 p-6 md:p-8 pointer-events-none">
+        <div className="max-w-2xl mx-auto space-y-3 pointer-events-auto">
           {/* Coaching Message Banner */}
           <div
-            className="glass rounded-xl p-3.5 border text-center transition-all duration-300"
+            className="p-3.5 text-center text-[13px] transition-colors"
             style={{
-              borderColor: alignment.ready ? 'rgba(16,185,129,0.3)' : 'rgba(0,212,255,0.2)',
-              background: alignment.ready ? 'rgba(16,185,129,0.08)' : 'rgba(0,212,255,0.05)',
+              background: 'var(--card)',
+              border: alignment.ready ? '1px solid var(--success)' : '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+              color: 'var(--foreground)',
             }}
           >
-            <div className="text-xs font-semibold text-white/90 flex items-center justify-center gap-2">
-              <span style={{ color: scoreColor }}>◈</span>
-              <span>{coachingText}</span>
-            </div>
+            {coachingText}
           </div>
 
-          {/* Alignment Score Meter & Action */}
-          <div className="glass-strong rounded-2xl p-5 border border-white/10 flex items-center justify-between gap-4">
-            <div className="flex-1 space-y-2">
-              <div className="flex items-center justify-between text-xs font-mono">
-                <span className="text-white/40 tracking-wider">AI POSTURE ALIGNMENT</span>
-                <span className="font-bold text-base" style={{ color: scoreColor }}>
-                  {alignment.score.toFixed(1)}%
-                </span>
-              </div>
-              <div className="h-2 rounded-full bg-white/6 overflow-hidden">
+          {/* Alignment Progress Bar & Start Action */}
+          <div
+            className="p-4 flex items-center justify-between gap-6"
+            style={{
+              background: 'var(--card)',
+              border: '1px solid var(--border)',
+              borderRadius: 'var(--radius)',
+            }}
+          >
+            <div className="flex-1 flex items-center gap-4">
+              <div className="flex-1">
+                <div className="flex items-center justify-between text-[11px] uppercase tracking-wider mb-1.5" style={{ color: 'var(--muted-foreground)' }}>
+                  <span>ALIGNMENT</span>
+                  <span className="font-display font-bold text-[20px] leading-none text-white">
+                    {Math.round(alignment.score)}%
+                  </span>
+                </div>
                 <div
-                  className="h-full rounded-full transition-all duration-300"
+                  className="w-full h-[6px] overflow-hidden"
                   style={{
-                    width: `${fillPercent}%`,
-                    background: `linear-gradient(90deg, ${scoreColor}80, ${scoreColor})`,
-                    boxShadow: `0 0 15px ${scoreColor}60`,
+                    background: 'var(--secondary)',
+                    borderRadius: '3px',
                   }}
-                />
+                >
+                  <div
+                    className="h-full transition-all duration-300"
+                    style={{
+                      width: `${fillPercent}%`,
+                      background: alignment.ready ? 'var(--success)' : 'var(--primary)',
+                      borderRadius: '3px',
+                    }}
+                  />
+                </div>
               </div>
             </div>
 
-            {/* Optional Manual Start Action */}
             <button
               onClick={startActiveTracking}
               disabled={!alignment.ready && alignment.score < 50}
-              className={`px-6 py-3 rounded-xl font-mono font-bold text-xs tracking-wider uppercase transition-all duration-300 flex items-center gap-2 flex-shrink-0 ${
-                alignment.ready || alignment.score >= 50
-                  ? 'bg-gradient-to-r from-emerald-500 to-cyan-500 text-black shadow-[0_0_25px_rgba(16,185,129,0.4)] hover:scale-105 active:scale-95 cursor-pointer'
-                  : 'bg-white/5 text-white/30 border border-white/8 cursor-not-allowed'
-              }`}
+              className="select-btn px-6 py-3 font-semibold text-[13px] uppercase tracking-wider cursor-pointer flex-shrink-0 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <span>▶</span>
-              <span>{alignment.ready ? 'STARTING...' : 'CALIBRATING...'}</span>
+              {alignment.ready ? 'START WORKOUT' : 'CALIBRATING'}
             </button>
           </div>
         </div>

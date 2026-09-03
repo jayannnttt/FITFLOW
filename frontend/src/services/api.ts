@@ -1,6 +1,15 @@
 import type { Category, ExerciseConfig, HistoryEntry, SessionSummary } from '../types'
 
-const API_BASE_URL = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/+$/, '')
+const getApiBaseUrl = (): string => {
+  const envUrl = (import.meta.env.VITE_API_BASE_URL || '').trim().replace(/\/+$/, '')
+  if (envUrl) return envUrl
+  if (typeof window !== 'undefined' && window.location.port === '5173') {
+    return 'http://127.0.0.1:8000'
+  }
+  return ''
+}
+
+const API_BASE_URL = getApiBaseUrl()
 
 /**
  * Fetch workout categories dictionary and map to Category array
@@ -53,6 +62,26 @@ export async function fetchSummary(): Promise<SessionSummary> {
   const res = await fetch(`${API_BASE_URL}/api/summary`)
   if (!res.ok) {
     throw new Error(`Failed to fetch session summary: ${res.statusText}`)
+  }
+  return await res.json()
+}
+
+/**
+ * Submit user exercise request to backend
+ * POST /api/exercise-request
+ */
+export async function requestExercise(exercise: string): Promise<{ success: boolean; message: string; exercise: string }> {
+  const res = await fetch(`${API_BASE_URL}/api/exercise-request`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      exercise: exercise.trim(),
+      timestamp: new Date().toISOString(),
+    }),
+  })
+  if (!res.ok) {
+    const errorData = await res.json().catch(() => ({}))
+    throw new Error(errorData.detail || `Request failed with status ${res.status}`)
   }
   return await res.json()
 }

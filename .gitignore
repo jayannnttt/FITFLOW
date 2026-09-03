@@ -17,6 +17,11 @@ venv/
 .env.local
 .env.*.local
 
+# Local helper scripts and artifacts
+run.bat
+run.ps1
+*.task
+
 # IDE & OS Generated Files
 .vscode/
 .idea/
